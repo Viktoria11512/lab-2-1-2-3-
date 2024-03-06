@@ -1,0 +1,113 @@
+from turtle import *
+from random import randint
+import math
+
+
+class Triangle:
+
+    def __init__(self, x1, y1, x2, y2):
+        self._vertex1 = (x1, y1)
+        self._vertex2 = (x2, y2)
+        self._position = (0, 0)
+        self._color = "black"
+        self._rotation = 0
+        self._scale = (1, 1)
+
+    def translate(self, dx, dy):
+        self._position = (self._position[0] + dx,
+                          self._position[1] + dy)
+
+    def set_position(self, x, y):
+        self._position = (x, y)
+
+    def set_color(self, color):
+        self._color = color
+
+    def set_rotation(self, rotation):
+        self._rotation = rotation
+
+    def set_scale(self, scale_x, scale_y):
+
+        self._scale = (scale_x, scale_y)
+
+    def calc_absolute_position(self, vertex):
+        x = self._position[0] + vertex[0]
+        y = self._position[1] + vertex[1]
+        return x, y
+
+    def rotate_point(self, point, angle):
+        x, y = point
+        rotated_x = x * math.cos(angle) - y * math.sin(angle)
+        rotated_y = x * math.sin(angle) + y * math.cos(angle)
+        return rotated_x, rotated_y
+
+    def draw(self):
+        v0 = self.calc_absolute_position((0, 0))
+        v1 = self.calc_absolute_position(self._vertex1)
+        v2 = self.calc_absolute_position(self._vertex2)
+
+        v0 = self.rotate_point(v0, self._rotation)
+        v1 = self.rotate_point(v1, self._rotation)
+        v2 = self.rotate_point(v2, self._rotation)
+        v0 = (v0[0] * self._scale[0], v0[1] * self._scale[1])
+        v1 = (v1[0] * self._scale[0], v1[1] * self._scale[1])
+        v2 = (v2[0] * self._scale[0], v2[1] * self._scale[1])
+
+        up()
+        pencolor(self._color)
+        setpos(*v0)
+        down()
+        goto(*v1)
+        goto(*v2)
+        goto(*v0)
+        up()
+def createTriangles(number):
+    colors = [
+        "green yellow",
+        "teal",
+        "deep pink",
+        "rosy brown",
+        "red",
+        "green",
+        "black",
+    ]
+
+    bound = 350
+    triangles = []
+    for i in range(number):
+        x1 = randint(-bound, bound)
+        y1 = randint(-bound, bound)
+        x2 = randint(-bound, bound)
+        y2 = randint(-bound, bound)
+        t = Triangle(x1, y1, x2, y2)
+        color_num = randint(0, len(colors) - 1)
+        t.set_color(colors[color_num])
+        triangles.append(t)
+    return triangles
+def animate_rotation(triangle, rotation_increment, steps):
+    for _ in range(steps):
+        triangle.set_rotation(triangle._rotation + rotation_increment)
+        clear()
+        triangle.draw()
+def animate_scaling(triangle, scale_increment_x, scale_increment_y, steps):
+    for i in range(steps):
+        scale_x = 1 + i * scale_increment_x
+        scale_y = 1 + i * scale_increment_y
+        triangle.set_scale(scale_x, scale_y)
+        clear()
+        triangle.draw()
+        update()
+        ontimer(None, 50)
+if __name__ == '__main__':
+    triangles = createTriangles(1)
+    triangle = triangles[0]
+    rotation_increment = math.pi / 36
+    scale_increment_x = 0.01
+    scale_increment_y = 0.01
+    steps = 100
+    animate_rotation(triangle, rotation_increment, steps)
+    triangle.set_rotation(0)
+    animate_scaling(triangle, scale_increment_x, scale_increment_y, steps)
+
+    mainloop()
+
